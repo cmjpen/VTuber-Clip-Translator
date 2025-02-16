@@ -69,12 +69,13 @@ The process is broken down into several stages:
     ```
 
 3.  Download `ffmpeg` and add it to your system path. Instructions for this can be found here: https://phoenixnap.com/kb/ffmpeg-windows
-
 ## Usage
 
 1.  Set up your API keys for OpenAI and Gemini by setting the environment variables `open_ai_key` and `gemini_key`.
 
-2.  Run the main script:
+2.  Set up your output directories and specify the YouTube clip link in the `if __name__ == "__main__"` block in `main.py`.
+
+3.  Run the main script:
 
     ```sh
     python main.py
