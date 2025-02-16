@@ -162,7 +162,8 @@ def translate_srt(nicknames_dict, vtuber_name, video_summary, srt_content, opena
                 Their nickname is {nickname}, which they may use when referring to themselves. 
                 If this is the case, translate it to the appropriate first person pronoun in English.
                 The nickname for {vtuber_name}'s fans is {fan_nickname}, which can be translated as "you guys" or whatever is appropriate for the situation.
-                :\n{line_group}"""
+                Here's a brief summary of the video in Japanese:\n{video_summary}
+                SRT to translate:\n{line_group}"""
         else:
             prev_context = batch["context_before"]
             tl_prompt = f"""Translate the following Japanese srt from Japanese to English. 
@@ -171,6 +172,7 @@ def translate_srt(nicknames_dict, vtuber_name, video_summary, srt_content, opena
                 Their nickname is {nickname}, which they may use when referring to themselves. 
                 If this is the case, translate it to the appropriate first person pronoun in English.
                 The nickname for {vtuber_name}'s fans is {fan_nickname}, which can be translated as "you guys" or whatever is appropriate for the situation.
+                Here's a brief summary of the video in Japanese:\n{video_summary}
                 Here is the dialogue which happened before the SRT for context: \n{prev_context}
                 \n\nSRT to translate:
                 :\n{line_group}"""
@@ -201,23 +203,25 @@ def create_summary(video_info_dict, nicknames_dict, vtuber_name, sub_extractor_o
 def main(openai_client, gem_model_id, clip_url, video_output_path, output_folder,
          all_frames_folder, unique_frames_folder, output_json, video_name, audio_file_path):
     """
-        Main function to process a Japanese VTuber clip, extract hardcoded subtitles, perform wiki and video scraping
-        to retrieve contextual information, perform whisper audio transcription on any gaps in the srt, merge into one transcription srt
-        then translate the transcription srt with contextual information via gpt-4o.
-        Args:
-            open_ai_api_key (str): API key for OpenAI.
-            gemini_api_key (str): API key for Gemini.
-            clip_url (str): URL of the video clip to be processed.
-            video_output_path (str): Path to save the downloaded video.
-            output_folder (str): Folder to save the output files.
-            all_frames_folder (str): Folder to save all frames extracted from the video.
-            unique_frames_folder (str): Folder to save unique frames extracted from the video.
-            output_json (str): Path to save the output JSON file.
-            video_name (str): Name of the video. (no file extension)
-            audio_file_path (str): Path to the audio file.
-        Returns:
-            None
-        """
+    Main function to process a Japanese VTuber clip, extract hardcoded subtitles, perform wiki and video scraping
+    to retrieve contextual information, perform whisper audio transcription on any gaps in the SRT, merge into one transcription SRT,
+    then translate the transcription SRT with contextual information via GPT-4o.
+    
+    Args:
+        openai_client (OpenAI): OpenAI client instance.
+        gem_model_id (str): Model ID for Gemini.
+        clip_url (str): URL of the video clip to be processed.
+        video_output_path (str): Path to save the downloaded video.
+        output_folder (str): Folder to save the output files.
+        all_frames_folder (str): Folder to save all frames extracted from the video.
+        unique_frames_folder (str): Folder to save unique frames extracted from the video.
+        output_json (str): Path to save the output JSON file.
+        video_name (str): Name of the video (without file extension).
+        audio_file_path (str): Path to the audio file.
+    
+    Returns:
+        str: Path to the final translated SRT file.
+    """
     #
     current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
