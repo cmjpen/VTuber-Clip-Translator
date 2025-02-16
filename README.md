@@ -1,6 +1,6 @@
 # VTuber Clip Translator
 
-This project automates the process of downloading VTuber clips from YouTube, extracting hardcoded subtitles, filling in gaps in the subtitles using audio transcription, and translating the subtitles from Japanese to English. Transcription and translation accuracy is significantly improved due to extracting hardcoded subtitles - as these are manually transcribed and usually error-free. Therefore, this project will work best with Japanese VTuber clips that have hardcoded subtitles and minimal other text on screen. For example: youtu.be/G3_M-h7u3iU
+This project automates the process of downloading VTuber clips from YouTube, extracting hardcoded subtitles, filling in gaps in the subtitles using audio transcription, and translating the subtitles from Japanese to English. Transcription and translation accuracy is significantly improved due to extracting hardcoded subtitles over just audio to text transcription. Therefore, this project will work best with Japanese VTuber clips that have hardcoded subtitles and minimal other text on screen. For example: youtu.be/G3_M-h7u3iU
 
 ## Limitations and Known Issues
 
@@ -17,6 +17,8 @@ This project automates the process of downloading VTuber clips from YouTube, ext
 3.  **Fill Gaps in Subtitles:** Identifies gaps in the subtitles and fills them using audio transcription (OpenAI Whisper).
 4.  **Translate Subtitles:** Translates the extracted and filled subtitles from Japanese to English using OpenAI's GPT-4o model.
 5.  **Scrape Webpages:** Scrapes the Wikipedia page of the featured VTuber for additional context to improve translation accuracy.
+
+The script outputs both transcription SRTs and the translated SRT.
 
 ## More Detailed Overview
 
@@ -49,9 +51,9 @@ The process is broken down into several stages:
 **4. Translation:**
 
 *   A translation prompt is constructed, including the VTuber's name, gender, nicknames, fan nicknames, and the Japanese video summary.
-*   The SRT is split into batches of 20 lines for translation.
+*   The SRT is split into batches of 20 lines for translation, which helps increase accuracy in both translation and timings.
 *   Previous lines (without timings) are prepended to each batch for context.
-*   The translated SRT is extracted from the Gemini response and written to a file.
+*   The translated SRT is extracted from the OpenAI response and written to a file.
 
 ## Installation
 
