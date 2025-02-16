@@ -1,0 +1,20 @@
+# sub_extractor_v2
+pillow==9.5.0
+paddleocr
+paddlepaddle
+opencv-python==4.7.0.72
+google-generativeai
+moviepy==1.0.3
+opencv-python
+
+# Gemini_test
+openai==1.61.1
+yt-dlp==2025.1.26
+selenium==4.15.2
+bs4==0.0.1
+html2text==2024.2.26
+urllib3==1.26.18
+markdownify==0.14.1
+webdriver-manager==4.0.1
+google-generativeai==0.8.4
+soundfile==0.12.1
