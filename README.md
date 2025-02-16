@@ -68,7 +68,7 @@ The process is broken down into several stages:
     pip install -r requirements.txt
     ```
 
-3.  Download `ffmpeg` and place it in the `tools` directory.
+3.  Download `ffmpeg` and add it to your system path.
 
 ## Usage
 
