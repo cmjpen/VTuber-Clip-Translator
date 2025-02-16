@@ -68,7 +68,7 @@ The process is broken down into several stages:
     pip install -r requirements.txt
     ```
 
-3.  Download `ffmpeg` and add it to your system path.
+3.  Download `ffmpeg` and add it to your system path. Instructions for this can be found here: https://phoenixnap.com/kb/ffmpeg-windows
 
 ## Usage
 
@@ -81,3 +81,18 @@ The process is broken down into several stages:
     ```
 
 ## Project Structure
+
+```
+├── main.py                 # Main script to run the translation process
+├── README.md               # Project documentation
+├── requirements.txt        # List of dependencies
+├── vtuber_clip_translator/ # Source code
+│   ├── download_video.py   # Module for downloading YouTube videos
+│   ├── scrape_webpage.py   # Module for extracting subtitles using OCR
+│   ├── whisper_gap_filler.py # Module for filling subtitle gaps using Whisper
+│   ├── subtitle_extractor.py # Module for translating subtitles
+│   ├── __init__.py         # Makes the directory a package
+│   └── utils/              # Utility functions
+│       ├── srt_processing.py # Module for processing SRT files
+│       └── __init__.py     # Makes the utils directory a package
+```
