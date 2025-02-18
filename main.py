@@ -200,6 +200,12 @@ def create_summary(video_info_dict, nicknames_dict, vtuber_name, sub_extractor_o
     video_summary = ask_gemini(prompt3, gem_model_id)
     return video_summary
 
+def test(youtube_url):
+    print(f"Here's the youtube URL executing in main.py:\n{youtube_url}")
+    with open(f"{youtube_url}.txt", "w") as file:
+        file.write(youtube_url)
+    return {"status":200, "message":"Glorious."}
+
 def main(openai_client, gem_model_id, clip_url, video_output_path, output_folder,
          all_frames_folder, unique_frames_folder, output_json, video_name, audio_file_path):
     """
@@ -245,7 +251,10 @@ def main(openai_client, gem_model_id, clip_url, video_output_path, output_folder
     print("Video Summary:\n", video_summary)
     
     # Correct OCR errors, passing the summary so that names do not get accidentally corrected
-    srt_filename = video_name+".srt"
+    if video_name:
+        srt_filename = video_name+".srt"
+    else:
+        srt_filename = "clip_"+clip_id+".srt"
     processed_subs_string, processed_srt_file = correct_transcription(video_summary, vtuber_name, nicknames_dict,
                                                                       sub_extractor_output, srt_filename, gem_model_id)
 
@@ -260,6 +269,43 @@ def main(openai_client, gem_model_id, clip_url, video_output_path, output_folder
     output_srt_filename = f"translated_subtitles_gpt4o_{clip_id}_{current_time}.srt"
     write_srt(translated_srt, output_srt_filename)
     return output_srt_filename
+
+def main_server(gem_model_id, clip_url):
+    timenow = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_folder = "output"
+    all_frames_folder = ""
+    unique_frames_folder = ""
+    video_name = f"clip_{timenow}"
+    audio_file_path = ""
+    delete_files = True
+    clip_url = "https://www.youtube.com/watch?v=AlmAKuTB0cc"
+    video_output_path = os.path.join(output_folder, video_name+".mp4")
+    output_json = video_name+".json"
+    output_srt = video_name+"_extracted_subs.srt"
+    all_frames_folder = os.path.join(output_folder, video_name+"_all_frames")
+    unique_frames_folder = os.path.join(output_folder, video_name+"_unique_frames")
+    audio_file_name = video_name + ".wav"
+    
+    GEMINI_API_KEY = os.environ.get('gemini_key')
+    OPENAI_API_KEY = os.environ.get('open_ai_key')
+
+    # Initialize OpenAI client
+    client = OpenAI(
+        api_key=OPENAI_API_KEY,
+    )
+    
+    gem_model_id = "gemini-2.0-flash-exp"
+    genai.configure(api_key=GEMINI_API_KEY)
+
+    audio_file_path = os.path.join(output_folder, audio_file_name)
+    translated_srt_file = main(client, gem_model_id, clip_url, video_output_path, output_folder,
+                                all_frames_folder, unique_frames_folder, output_json, video_name, audio_file_path)
+    if delete_files:
+        os.remove(video_output_path)
+        os.rmdir(all_frames_folder)
+        os.rmdir(unique_frames_folder)
+    
+    return translated_srt_file
 
 if __name__ == "__main__":
     start_time = time.time()
