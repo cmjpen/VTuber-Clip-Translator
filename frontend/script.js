@@ -12,6 +12,9 @@ async function submitVideo() {
         return;
     }
     
+    // Disable the button to prevent multiple submissions
+    translateButton.disabled = true;
+    
     // Extract the video ID from the YouTube link
     const videoId = youtubeLink.split('v=')[1];
     const ampersandPosition = videoId.indexOf('&');
@@ -43,5 +46,8 @@ async function submitVideo() {
         }
     } catch (error) {
         statusElement.innerText = "Failed to connect to the server.";
+    } finally {
+        // Re-enable the button after processing is complete
+        translateButton.disabled = false;
     }
 }

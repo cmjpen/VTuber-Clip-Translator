@@ -3,6 +3,7 @@ import re
 import json
 import time
 import datetime
+import shutil
 
 from openai import OpenAI
 import google.generativeai as genai
@@ -120,7 +121,7 @@ def correct_transcription(video_summary, vtuber_name, nicknames_dict, sub_extrac
 
     return processed_subs_string, processed_srt_file
 
-def fill_gaps(processed_srt_file, processed_subs_string, video_file_path, audio_file_path, openai_client, gap_threshold=2.0):
+def fill_gaps(processed_srt_file, processed_subs_string, video_file_path, audio_file_path, openai_client, video_name, gap_threshold=2.0):
     gap_data = process_gaps_main(processed_srt_file, video_file_path, audio_file_path,
                                  openai_client, gap_threshold)
     if gap_data:
@@ -228,12 +229,16 @@ def main(openai_client, gem_model_id, clip_url, video_output_path, output_folder
     Returns:
         str: Path to the final translated SRT file.
     """
+    print("called main!!!")
+    
     #
     current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 
     # CLIP DOWNLOAD
     video_info_dict, clip_id, video_output_path = download_clip(clip_url, video_output_path)
-
+    
+    # video_name = "clip_"+clip_id
+    output_srt = video_name+"_extracted_subs.srt"
     # Get vtuber_name from yt-dlp
     vtuber_name, og_stream_url = get_vtuber_name(video_info_dict, gem_model_id)
 
@@ -260,7 +265,7 @@ def main(openai_client, gem_model_id, clip_url, video_output_path, output_folder
 
     # GAP FILLING
     srt_content = fill_gaps(processed_srt_file, processed_subs_string, video_output_path,
-                           audio_file_path, openai_client)
+                           audio_file_path, openai_client, video_name)
     
     # TRANSLATION
     translated_srt = translate_srt(nicknames_dict, vtuber_name, video_summary, srt_content, openai_client)
@@ -270,15 +275,14 @@ def main(openai_client, gem_model_id, clip_url, video_output_path, output_folder
     write_srt(translated_srt, output_srt_filename)
     return output_srt_filename
 
-def main_server(gem_model_id, clip_url):
+def main_server(clip_url):
     timenow = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     output_folder = "output"
+    output_folder = os.path.join(os.getcwd(), "output")
     all_frames_folder = ""
     unique_frames_folder = ""
     video_name = f"clip_{timenow}"
-    audio_file_path = ""
-    delete_files = True
-    clip_url = "https://www.youtube.com/watch?v=AlmAKuTB0cc"
+    delete_files = False
     video_output_path = os.path.join(output_folder, video_name+".mp4")
     output_json = video_name+".json"
     output_srt = video_name+"_extracted_subs.srt"
@@ -300,12 +304,14 @@ def main_server(gem_model_id, clip_url):
     audio_file_path = os.path.join(output_folder, audio_file_name)
     translated_srt_file = main(client, gem_model_id, clip_url, video_output_path, output_folder,
                                 all_frames_folder, unique_frames_folder, output_json, video_name, audio_file_path)
-    if delete_files:
-        os.remove(video_output_path)
-        os.rmdir(all_frames_folder)
-        os.rmdir(unique_frames_folder)
     
-    return translated_srt_file
+    if delete_files:
+        print("Deleting files")
+        os.remove(video_output_path)
+        shutil.rmtree(all_frames_folder, ignore_errors=True)
+        shutil.rmtree(unique_frames_folder, ignore_errors=True)
+    
+    return {"message":f"Translated SRT {translated_srt_file} created successfully.", "status":200}
 
 if __name__ == "__main__":
     start_time = time.time()

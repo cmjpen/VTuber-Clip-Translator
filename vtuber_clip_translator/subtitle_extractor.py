@@ -765,7 +765,11 @@ def extract_subs_main(video_path, output_dir, all_frames_folder, unique_frames_f
         ValueError: If the video file cannot be opened or read.
     """
     # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        print(f"Created dir because {output_dir} did not exist")
+    else:
+        print(f"Didn't create ouput_dir because it already exists: {output_dir}")
 
     # Set the current working directory to the output directory
     os.chdir(output_dir)
